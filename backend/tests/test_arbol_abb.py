@@ -1,5 +1,6 @@
 
 import unittest
+from datetime import date
 
 from backend.estructuras.elemento import Elemento
 from backend.estructuras.arbol_abb import ArbolABB
@@ -54,6 +55,72 @@ class TestArbolABB(unittest.TestCase):
 
     def test_altura(self):
         self.assertEqual(self.arbol.altura(), 3)
+
+    def test_buscar_vencidos(self):
+        self.arbol = ArbolABB()
+
+        vencido = Elemento(
+            1, "Tarea vencida", "Descripción",
+            "tarea", "2026-11-10", "Alta",
+            [], "", "Pendiente"
+        )
+
+        vigente = Elemento(
+            2, "Tarea vigente", "Descripción",
+            "tarea", "2026-12-10", "Media",
+            [], "", "Pendiente"
+        )
+
+        completado = Elemento(
+            3, "Tarea completada", "Descripción",
+            "tarea", "2026-11-10", "Alta",
+            [], "", "Completada"
+        )
+
+        cancelado = Elemento(
+            4, "Tarea cancelada", "Descripción",
+            "tarea", "2026-11-10", "Alta",
+            [], "", "Cancelada"
+        )
+
+        for elemento in [vencido, vigente, completado, cancelado]:
+            self.arbol.insertar(elemento)
+
+        resultado = self.arbol.buscar_vencidos(date(2026, 11, 19))
+
+        self.assertEqual([e.id for e in resultado], [1])
+
+    def test_buscar_por_etiqueta(self):
+        self.arbol = ArbolABB()
+
+        elemento1 = Elemento(
+            1, "Tarea 1", "Descripción",
+            "tarea", "2026-12-10", "Alta",
+            ["Universidad", "Urgente"], "", "Pendiente"
+        )
+
+        elemento2 = Elemento(
+            2, "Tarea 2", "Descripción",
+            "tarea", "2026-12-10", "Media",
+            ["Trabajo"], "", "Pendiente"
+        )
+
+        self.arbol.insertar(elemento1)
+        self.arbol.insertar(elemento2)
+
+        resultado = self.arbol.buscar_por_etiqueta("universidad")
+
+        self.assertEqual([e.id for e in resultado], [1])
+
+    def test_buscar_etiqueta_sin_resultados(self):
+        resultado = self.arbol.buscar_por_etiqueta("Deportes")
+
+        self.assertEqual(resultado, [])
+
+    def test_buscar_vencidos_sin_resultados(self):
+        resultado = self.arbol.buscar_vencidos(date(2026, 11, 19))
+
+        self.assertEqual(resultado, [])
 
 
 if __name__ == "__main__":

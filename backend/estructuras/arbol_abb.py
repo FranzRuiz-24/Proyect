@@ -1,6 +1,6 @@
 
 from .nodo import Nodo
-
+from datetime import date
 
 class ArbolABB:
 
@@ -139,3 +139,34 @@ class ArbolABB:
             + self._contar_recursivo(nodo.izquierda)
             + self._contar_recursivo(nodo.derecha)
         )
+    def buscar_vencidos(self, fecha_actual=None):
+        if fecha_actual is None:
+            fecha_actual = date.today()
+
+        elementos_vencidos = []
+
+        for elemento in self.recorrido_inorden():
+            if elemento.fecha_vencimiento:
+                fecha = date.fromisoformat(elemento.fecha_vencimiento)
+
+                estado = elemento.estado.lower()
+
+                if (
+                    fecha < fecha_actual
+                    and estado not in ["completada", "cancelada"]
+                ):
+                    elementos_vencidos.append(elemento)
+
+        return elementos_vencidos
+
+    def buscar_por_etiqueta(self, etiqueta):
+        elementos_encontrados = []
+
+        for elemento in self.recorrido_inorden():
+            if any(
+                etiqueta.lower() == e.lower()
+                for e in elemento.etiquetas
+            ):
+                elementos_encontrados.append(elemento)
+
+        return elementos_encontrados
